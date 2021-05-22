@@ -138,6 +138,13 @@ private:
 
     auto latest_input_timestamp(std::lock_guard<std::mutex> const&) -> std::chrono::nanoseconds;
 
+    /// Modifies the scene surface's geometry if needed, should not be called under lock
+    void modify_surface_geometry(
+        std::shared_ptr<scene::Surface> const& scene_surface,
+        uint16_t xcb_value_mask,
+        int16_t x, int16_t y,
+        int16_t width, int16_t height);
+
     /// Appplies any mods in nullable_pending_spec to the scene_surface (if any)
     void apply_any_mods_to_scene_surface();
 
@@ -162,11 +169,15 @@ private:
     auto scaled_content_size_of(scene::Surface const& surface) -> geometry::Size;
     /// @}
 
-    void window_type(std::vector<xcb_atom_t> const& wm_types);
-    void set_parent(xcb_window_t xcb_window, std::lock_guard<std::mutex> const&);
-    void fix_parent_if_necessary(const std::lock_guard<std::mutex>& lock);
+    /// Returns a surface that could act as this surface's parent, or nullptr if none
+    auto plausible_parent(std::lock_guard<std::mutex> const&) -> std::shared_ptr<scene::Surface>;
+    /// Applies cached.transient_for and cached.type to the spec
+    void apply_cached_transient_for_and_type(std::lock_guard<std::mutex> const& lock);
     void wm_size_hints(std::vector<int32_t> const& hints);
     void motif_wm_hints(std::vector<uint32_t> const& hints);
+
+    /// Returns the scene surface associated with a given xcb_window, or nullptr if none
+    static auto xcb_window_get_scene_surface(XWaylandWM* xwm, xcb_window_t window) -> std::shared_ptr<scene::Surface>;
 
     XWaylandWM* const xwm;
     std::shared_ptr<XCBConnection> const connection;
@@ -196,6 +207,9 @@ private:
 
         /// True if server-side decorations have been explicitly disabled with motif hints
         bool motif_decorations_disabled{false};
+
+        xcb_window_t transient_for{XCB_WINDOW_NONE};
+        MirWindowType type{mir_window_type_freestyle};
     } cached;
 
     /// Set in set_wl_surface and cleared when a scene surface is created from it
@@ -203,6 +217,7 @@ private:
     std::unique_ptr<shell::SurfaceSpecification> nullable_pending_spec;
     std::shared_ptr<XWaylandClientManager::Session> client_session;
     std::weak_ptr<scene::Surface> weak_scene_surface;
+    std::weak_ptr<scene::Surface> effective_parent;
 };
 } /* frontend */
 } /* mir */
