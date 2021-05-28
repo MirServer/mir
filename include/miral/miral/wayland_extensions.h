@@ -120,6 +120,12 @@ public:
     /// Could allow a client to extract information about other programs the user is running
     /// \remark Since MirAL 3.1
     static char const* const zwlr_foreign_toplevel_manager_v1;
+
+    /// Allows clients to act as a virtual keyboard, useful for on-screen keyboards.
+    /// Clients are not required to display anything to send keyboard events using this extension,
+    /// so malicious clients could use it to take actions without user input.
+    /// \remark Since MirAL 3.3
+    static char const* const zwp_virtual_keyboard_manager_v1;
     /** @} */
 
     /// Add a bespoke Wayland extension both to "supported" and "enabled by default".
