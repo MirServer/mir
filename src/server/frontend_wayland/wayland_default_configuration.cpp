@@ -34,6 +34,8 @@
 #include "pointer_constraints_unstable_v1.h"
 #include "relative-pointer-unstable-v1_wrapper.h"
 #include "relative_pointer_unstable_v1.h"
+#include "virtual-keyboard-unstable-v1_wrapper.h"
+#include "virtual_keyboard_v1.h"
 
 #include "mir/graphics/platform.h"
 #include "mir/options/default_configuration.h"
@@ -122,6 +124,10 @@ std::vector<ExtensionBuilder> const internal_extension_builders = {
     {
         mw::PointerConstraintsV1::interface_name, [](auto const& ctx) -> std::shared_ptr<void>
             { return mf::create_pointer_constraints_unstable_v1(ctx.display, *ctx.wayland_executor, ctx.shell); }
+    },
+    {
+        mw::VirtualKeyboardManagerV1::interface_name, [](auto const& ctx) -> std::shared_ptr<void>
+            { return mf::create_virtual_keyboard_manager_v1(ctx.display); }
     },
 };
 
