@@ -401,3 +401,22 @@ global:
     virtual?thunk?to?mir::wayland::RelativePointerV1::?RelativePointerV1*;
   };
 } MIRWAYLAND_2.1;
+
+MIRWAYLAND_2.2.2 {
+global:
+  extern "C++" {
+    mir::wayland::VirtualKeyboardManagerV1::*;
+    non-virtual?thunk?to?mir::wayland::VirtualKeyboardManagerV1::*;
+    typeinfo?for?mir::wayland::VirtualKeyboardManagerV1;
+    vtable?for?mir::wayland::VirtualKeyboardManagerV1;
+    typeinfo?for?mir::wayland::VirtualKeyboardManagerV1::Global;
+    vtable?for?mir::wayland::VirtualKeyboardManagerV1::Global;
+    virtual?thunk?to?mir::wayland::VirtualKeyboardManagerV1::?VirtualKeyboardManagerV1*;
+
+    mir::wayland::VirtualKeyboardV1::*;
+    non-virtual?thunk?to?mir::wayland::VirtualKeyboardV1::*;
+    typeinfo?for?mir::wayland::VirtualKeyboardV1;
+    vtable?for?mir::wayland::VirtualKeyboardV1;
+    virtual?thunk?to?mir::wayland::VirtualKeyboardV1::?VirtualKeyboardV1*;
+  };
+} MIRWAYLAND_2.2.1;
