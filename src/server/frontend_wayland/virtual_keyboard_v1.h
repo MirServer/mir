@@ -29,12 +29,16 @@ namespace input
 class InputDeviceHub;
 class Seat;
 class Keymap;
+class InputDeviceRegistry;
 }
 namespace frontend
 {
 class VirtualKeyboardManagerV1Global;
 
-auto create_virtual_keyboard_manager_v1(wl_display* display) -> std::shared_ptr<VirtualKeyboardManagerV1Global>;
+auto create_virtual_keyboard_manager_v1(
+    wl_display* display,
+    std::shared_ptr<input::InputDeviceRegistry> const& device_registry)
+-> std::shared_ptr<VirtualKeyboardManagerV1Global>;
 }
 }
 

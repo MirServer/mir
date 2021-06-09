@@ -127,7 +127,7 @@ std::vector<ExtensionBuilder> const internal_extension_builders = {
     },
     {
         mw::VirtualKeyboardManagerV1::interface_name, [](auto const& ctx) -> std::shared_ptr<void>
-            { return mf::create_virtual_keyboard_manager_v1(ctx.display); }
+            { return mf::create_virtual_keyboard_manager_v1(ctx.display, ctx.input_device_registry); }
     },
 };
 
