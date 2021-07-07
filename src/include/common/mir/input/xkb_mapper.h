@@ -39,7 +39,6 @@ using XKBContextPtr = std::unique_ptr<xkb_context, void(*)(xkb_context*)>;
 XKBContextPtr make_unique_context();
 
 using XKBKeymapPtr = std::unique_ptr<xkb_keymap, void(*)(xkb_keymap*)>;
-XKBKeymapPtr make_unique_keymap(xkb_context* context, char const* buffer, size_t size);
 
 using XKBStatePtr = std::unique_ptr<xkb_state, void(*)(xkb_state*)>;
 using XKBComposeTablePtr = std::unique_ptr<xkb_compose_table, void(*)(xkb_compose_table*)>;
@@ -55,9 +54,7 @@ public:
 
     void set_key_state(MirInputDeviceId id, std::vector<uint32_t> const& key_state) override;
     void set_keymap_for_device(MirInputDeviceId id, Keymap const& map) override;
-    void set_keymap_for_device(MirInputDeviceId id, char const* buffer, size_t len) override;
     void set_keymap_for_all_devices(Keymap const& map) override;
-    void set_keymap_for_all_devices(char const* buffer, size_t len) override;
     void clear_keymap_for_device(MirInputDeviceId id) override;
     void clear_all_keymaps() override;
     void map_event(MirEvent& event) override;

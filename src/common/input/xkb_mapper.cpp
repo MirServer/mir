@@ -126,15 +126,6 @@ mi::XKBContextPtr mi::make_unique_context()
     return {xkb_context_new(xkb_context_flags(0)), &xkb_context_unref};
 }
 
-mi::XKBKeymapPtr mi::make_unique_keymap(xkb_context* context, char const* buffer, size_t size)
-{
-    auto keymap_ptr = xkb_keymap_new_from_buffer(context, buffer, size, XKB_KEYMAP_FORMAT_TEXT_V1, xkb_keymap_compile_flags(0));
-    if (!keymap_ptr)
-        BOOST_THROW_EXCEPTION(std::runtime_error("failed to create keymap from buffer."));
-
-    return {keymap_ptr, &xkb_keymap_unref};
-}
-
 mircv::XKBMapper::XKBMapper() :
     context{make_unique_context()},
     compose_table{make_unique_compose_table_from_locale(context, get_locale_from_environment())}
@@ -220,11 +211,6 @@ void mircv::XKBMapper::set_keymap_for_all_devices(Keymap const& new_keymap)
     set_keymap(new_keymap.make_unique_xkb_keymap(context.get()));
 }
 
-void mircv::XKBMapper::set_keymap_for_all_devices(char const* buffer, size_t len)
-{
-    set_keymap(make_unique_keymap(context.get(), buffer, len));
-}
-
 void mircv::XKBMapper::set_keymap(XKBKeymapPtr new_keymap)
 {
     std::lock_guard<std::mutex> lg(guard);
@@ -235,11 +221,6 @@ void mircv::XKBMapper::set_keymap(XKBKeymapPtr new_keymap)
 void mircv::XKBMapper::set_keymap_for_device(MirInputDeviceId id, Keymap const& new_keymap)
 {
     set_keymap(id, new_keymap.make_unique_xkb_keymap(context.get()));
-}
-
-void mircv::XKBMapper::set_keymap_for_device(MirInputDeviceId id, char const* buffer, size_t len)
-{
-    set_keymap(id, make_unique_keymap(context.get(), buffer, len));
 }
 
 void mircv::XKBMapper::set_keymap(MirInputDeviceId id, XKBKeymapPtr new_keymap)
