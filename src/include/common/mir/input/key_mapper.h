@@ -53,7 +53,7 @@ public:
     /**
      * Set a keymap for the device \a id
      */
-    virtual void set_keymap_for_device(MirInputDeviceId id, Keymap const& map) = 0;
+    virtual void set_keymap_for_device(MirInputDeviceId id, std::shared_ptr<Keymap> map) = 0;
 
     /**
      * Remove the specific keymap defined for device identified via the \a id.
@@ -65,7 +65,7 @@ public:
     /**
      * Set a default keymap for all devices.
      */
-    virtual void set_keymap_for_all_devices(Keymap const& map) = 0;
+    virtual void set_keymap_for_all_devices(std::shared_ptr<Keymap> map) = 0;
 
     /*
      * Remove all keymap configurations

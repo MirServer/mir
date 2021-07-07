@@ -42,7 +42,7 @@ struct MirKeyboardConfig
     mir::input::Keymap const& device_keymap() const;
     mir::input::Keymap& device_keymap();
     void device_keymap(std::shared_ptr<mir::input::Keymap> keymap);
-    auto device_keymap_shared() -> std::shared_ptr<mir::input::Keymap> const&;
+    auto device_keymap_shared() const -> std::shared_ptr<mir::input::Keymap> const&;
 
     bool operator==(MirKeyboardConfig const& rhs) const;
     bool operator!=(MirKeyboardConfig const& rhs) const;

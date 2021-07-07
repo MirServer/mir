@@ -53,8 +53,8 @@ public:
     XKBMapper();
 
     void set_key_state(MirInputDeviceId id, std::vector<uint32_t> const& key_state) override;
-    void set_keymap_for_device(MirInputDeviceId id, Keymap const& map) override;
-    void set_keymap_for_all_devices(Keymap const& map) override;
+    void set_keymap_for_device(MirInputDeviceId id, std::shared_ptr<Keymap> map) override;
+    void set_keymap_for_all_devices(std::shared_ptr<Keymap> map) override;
     void clear_keymap_for_device(MirInputDeviceId id) override;
     void clear_all_keymaps() override;
     void map_event(MirEvent& event) override;

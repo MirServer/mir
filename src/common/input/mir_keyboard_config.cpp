@@ -81,7 +81,7 @@ void MirKeyboardConfig::device_keymap(std::shared_ptr<mi::Keymap> keymap)
     impl->device_keymap = std::move(keymap);
 }
 
-auto MirKeyboardConfig::device_keymap_shared() -> std::shared_ptr<mir::input::Keymap> const&
+auto MirKeyboardConfig::device_keymap_shared() const -> std::shared_ptr<mir::input::Keymap> const&
 {
     return impl->device_keymap;
 }
