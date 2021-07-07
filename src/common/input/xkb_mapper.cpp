@@ -206,9 +206,9 @@ mircv::XKBMapper::XkbMappingState* mircv::XKBMapper::get_keymapping_state(MirInp
     return nullptr;
 }
 
-void mircv::XKBMapper::set_keymap_for_all_devices(Keymap const& new_keymap)
+void mircv::XKBMapper::set_keymap_for_all_devices(std::shared_ptr<Keymap> new_keymap)
 {
-    set_keymap(new_keymap.make_unique_xkb_keymap(context.get()));
+    set_keymap(new_keymap->make_unique_xkb_keymap(context.get()));
 }
 
 void mircv::XKBMapper::set_keymap(XKBKeymapPtr new_keymap)
@@ -218,9 +218,9 @@ void mircv::XKBMapper::set_keymap(XKBKeymapPtr new_keymap)
     device_mapping.clear();
 }
 
-void mircv::XKBMapper::set_keymap_for_device(MirInputDeviceId id, Keymap const& new_keymap)
+void mircv::XKBMapper::set_keymap_for_device(MirInputDeviceId id, std::shared_ptr<Keymap> new_keymap)
 {
-    set_keymap(id, new_keymap.make_unique_xkb_keymap(context.get()));
+    set_keymap(id, new_keymap->make_unique_xkb_keymap(context.get()));
 }
 
 void mircv::XKBMapper::set_keymap(MirInputDeviceId id, XKBKeymapPtr new_keymap)

@@ -50,7 +50,7 @@ mi::DefaultDevice::DefaultDevice(MirInputDeviceId id,
     if (contains(info.capabilities, mi::DeviceCapability::keyboard))
     {
         keyboard = MirKeyboardConfig{};
-        key_mapper->set_keymap_for_device(device_id, keyboard.value().device_keymap());
+        key_mapper->set_keymap_for_device(device_id, keyboard.value().device_keymap_shared());
     }
 }
 
@@ -224,7 +224,7 @@ void mi::DefaultDevice::set_keyboard_configuration(MirKeyboardConfig const& conf
         keyboard = conf;
     else
         return;
-    key_mapper->set_keymap_for_device(device_id, conf.device_keymap());
+    key_mapper->set_keymap_for_device(device_id, conf.device_keymap_shared());
 }
 
 mir::optional_value<MirTouchscreenConfig> mi::DefaultDevice::touchscreen_configuration() const
