@@ -76,6 +76,7 @@ struct X11PlatformTest : ::testing::Test
                                           dev->start(&mock_pointer_sink, &builder);
                                       else if (contains(info.capabilities, mi::DeviceCapability::keyboard))
                                           dev->start(&mock_keyboard_sink, &builder);
+                                      return nullptr;
                                   })
                           );
     }

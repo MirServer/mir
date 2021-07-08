@@ -59,7 +59,7 @@ namespace
 class StubInputDeviceRegistry : public mi::InputDeviceRegistry
 {
 public:
-    void add_device(std::shared_ptr<mi::InputDevice> const&) override {}
+    auto add_device(std::shared_ptr<mi::InputDevice> const&) -> std::shared_ptr<mi::Device> override { return {}; }
     void remove_device(std::shared_ptr<mi::InputDevice> const&) override {}
 };
 
