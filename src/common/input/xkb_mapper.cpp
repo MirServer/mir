@@ -195,11 +195,13 @@ mircv::XKBMapper::XkbMappingState* mircv::XKBMapper::get_keymapping_state(MirInp
     }
     if (default_keymap)
     {
+        auto mapping_state = std::make_unique<XkbMappingState>(default_keymap, default_compiled_keymap);
         decltype(device_mapping.begin()) insertion_pos;
         std::tie(insertion_pos, std::ignore) =
-            device_mapping.emplace(std::piecewise_construct,
-                                   std::forward_as_tuple(id),
-                                   std::forward_as_tuple(std::make_unique<XkbMappingState>(default_keymap)));
+            device_mapping.emplace(
+                std::piecewise_construct,
+                std::forward_as_tuple(id),
+                std::forward_as_tuple(std::move(mapping_state)));
 
         return insertion_pos->second.get();
     }
@@ -208,29 +210,34 @@ mircv::XKBMapper::XkbMappingState* mircv::XKBMapper::get_keymapping_state(MirInp
 
 void mircv::XKBMapper::set_keymap_for_all_devices(std::shared_ptr<Keymap> new_keymap)
 {
-    set_keymap(new_keymap->make_unique_xkb_keymap(context.get()));
+    set_keymap(new_keymap);
 }
 
-void mircv::XKBMapper::set_keymap(XKBKeymapPtr new_keymap)
+void mircv::XKBMapper::set_keymap(std::shared_ptr<Keymap> new_keymap)
 {
     std::lock_guard<std::mutex> lg(guard);
     default_keymap = std::move(new_keymap);
+    default_compiled_keymap = default_keymap->make_unique_xkb_keymap(context.get());
     device_mapping.clear();
 }
 
 void mircv::XKBMapper::set_keymap_for_device(MirInputDeviceId id, std::shared_ptr<Keymap> new_keymap)
 {
-    set_keymap(id, new_keymap->make_unique_xkb_keymap(context.get()));
+    set_keymap(id, std::move(new_keymap));
 }
 
-void mircv::XKBMapper::set_keymap(MirInputDeviceId id, XKBKeymapPtr new_keymap)
+void mircv::XKBMapper::set_keymap(MirInputDeviceId id, std::shared_ptr<Keymap> new_keymap)
 {
     std::lock_guard<std::mutex> lg(guard);
 
+    auto compiled_keymap = new_keymap->make_unique_xkb_keymap(context.get());
+    auto mapping_state = std::make_unique<XkbMappingState>(std::move(new_keymap), std::move(compiled_keymap));
+
     device_mapping.erase(id);
-    device_mapping.emplace(std::piecewise_construct,
-                           std::forward_as_tuple(id),
-                           std::forward_as_tuple(std::make_unique<XkbMappingState>(std::move(new_keymap))));
+    device_mapping.emplace(
+        std::piecewise_construct,
+        std::forward_as_tuple(id),
+        std::forward_as_tuple(std::move(mapping_state)));
 }
 
 void mircv::XKBMapper::clear_all_keymaps()
@@ -266,14 +273,17 @@ MirInputEventModifiers mircv::XKBMapper::device_modifiers(MirInputDeviceId id) c
     return expand_modifiers(it->second->modifiers());
 }
 
-mircv::XKBMapper::XkbMappingState::XkbMappingState(std::shared_ptr<xkb_keymap> const& keymap)
-    : keymap{keymap}, state{make_unique_state(this->keymap.get())}
+mircv::XKBMapper::XkbMappingState::XkbMappingState(
+    std::shared_ptr<Keymap> keymap,
+    std::shared_ptr<xkb_keymap> compiled_keymap)
+    : keymap{std::move(keymap)},
+      compiled_keymap{std::move(compiled_keymap)},
+      state{make_unique_state(this->compiled_keymap.get())}
 {
 }
 
 void mircv::XKBMapper::XkbMappingState::set_key_state(std::vector<uint32_t> const& key_state)
 {
-    state = make_unique_state(keymap.get());
     modifier_state = mir_input_event_modifier_none;
     std::unordered_set<uint32_t> pressed_codes;
     std::string t;
