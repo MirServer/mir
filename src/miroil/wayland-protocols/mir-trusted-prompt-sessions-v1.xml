@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="mir_trusted_prompt_sessions_unstable_v1">
+  <copyright>
+    Copyright © 2020 Canonical
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice (including the next
+    paragraph) shall be included in all copies or substantial portions of the
+    Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+  </copyright>
+
+  <description summary="Trusted prompt session protocol">
+    TODO
+  </description>
+
+  <interface name="zmir_trusted_prompt_sessions_manager_v1" version="1">
+    <description summary="Mir trusted prompt session manager">
+      TODO
+    </description>
+
+    <request name="create_prompt_session">
+      <description summary="create a new trusted prompt session">
+        Create a new trusted prompt session.
+      </description>
+      <arg name="id" type="new_id" interface="zmir_trusted_prompt_session_v1"/>
+      <arg name="application_pid" type="uint" summary="process id of the initiating application"/>
+    </request>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy the trusted prompt session manager">
+        Destroy the trusted prompt session manager.
+      </description>
+    </request>
+  </interface>
+
+  <interface name="zmir_prompt_session_v1" version="1">
+
+    <request name="new_fds_for_prompt_providers">
+      <description summary="allocate some FDs for prompt providers to connect on">
+        TODO Need to translate this to something meaningful on Wayland
+      </description>
+      <arg name="no_of_fds" type="uint" summary="number of fds to allocate"/>
+    </request>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy the trusted prompt session">
+        Destroy the trusted prompt session.
+      </description>
+    </request>
+
+    <enum name="state">
+      <entry name="stopped" value="0"/>
+      <entry name="started" value="1"/>
+      <entry name="suspended" value="2"/>
+    </enum>
+
+    <event name="state_change">
+      <arg name="state" type="uint" summary="see enum state"/>
+    </event>
+
+    <event name="fd_callback">
+      <arg name="fd" type="fd" summary="allocated FD"/>
+    </event>
+  </interface>
+</protocol>

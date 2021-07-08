@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@/miroil
+
+Name: miral
+Description: Mir "OIL" (lomiri support) library
+Version: @MIROIL_VERSION@
+Requires: mircommon
+Libs: -L${libdir} -lmiroil
+Cflags: -I${includedir}

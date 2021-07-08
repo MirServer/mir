@@ -789,6 +789,7 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/README.md \
                          @CMAKE_CURRENT_SOURCE_DIR@/examples/example-server-lib \
                          @CMAKE_CURRENT_SOURCE_DIR@/include/core \
                          @CMAKE_CURRENT_SOURCE_DIR@/include/miral \
+                         @CMAKE_CURRENT_SOURCE_DIR@/include/miroil \
                          @MIR_GENERATED_INCLUDE_DIRECTORIES_FLATTENED@
 
 # This tag can be used to specify the character encoding of the source files

@@ -1,0 +1,78 @@
+libmiroil.so.1 libmiroil1 #MINVER#
+ MIROIL_1.0@MIROIL_1.0 2.4.0
+ (c++)"miroil::Compositor::~Compositor()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::DisplayConfigurationPolicy::DisplayConfigurationPolicy()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::DisplayConfigurationPolicy::~DisplayConfigurationPolicy()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::Edid::Descriptor::string_value[abi:cxx11]() const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::Edid::parse_data(std::vector<unsigned char, std::allocator<unsigned char> > const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::EventBuilder::EventBuilder()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::EventBuilder::EventInfo::store(MirInputEvent const*, unsigned long)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::EventBuilder::add_touch(MirEvent&, int, MirTouchAction, MirTouchTooltype, float, float, float, float, float, float)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::EventBuilder::find_info(unsigned long)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::EventBuilder::make_key_event(long, std::chrono::duration<long, std::ratio<1l, 1000000000l> >, std::vector<unsigned char, std::allocator<unsigned char> > const&, MirKeyboardAction, unsigned int, int, unsigned int)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::EventBuilder::make_pointer_event(long, std::chrono::duration<long, std::ratio<1l, 1000000000l> >, std::vector<unsigned char, std::allocator<unsigned char> > const&, unsigned int, MirPointerAction, unsigned int, float, float, float, float, float, float)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::EventBuilder::make_touch_event(long, std::chrono::duration<long, std::ratio<1l, 1000000000l> >, std::vector<unsigned char, std::allocator<unsigned char> > const&, unsigned int)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::EventBuilder::store(MirInputEvent const*, unsigned long)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::EventBuilder::~EventBuilder()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::GLBuffer::GLBuffer()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::GLBuffer::GLBuffer(std::shared_ptr<mir::graphics::Buffer> const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::GLBuffer::bind()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::GLBuffer::operator bool() const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::GLBuffer::reset()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::GLBuffer::reset(std::shared_ptr<mir::graphics::Buffer> const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::GLBuffer::size() const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::GLBuffer::~GLBuffer()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::InputDevice()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::InputDevice(miroil::InputDevice const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::InputDevice(miroil::InputDevice&&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::InputDevice(std::shared_ptr<mir::input::Device> const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::apply_keymap(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::get_device_id()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::get_device_name[abi:cxx11]()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::is_alpha_numeric()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::is_keyboard()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::operator=(miroil::InputDevice const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::operator=(miroil::InputDevice&&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::operator==(miroil::InputDevice const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDevice::~InputDevice()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::InputDeviceObserver::~InputDeviceObserver()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::MirServerHooks::MirServerHooks()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::MirServerHooks::create_input_device_observer(std::shared_ptr<miroil::InputDeviceObserver>&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::MirServerHooks::create_named_cursor(std::function<std::shared_ptr<mir::graphics::CursorImage> (std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)>)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::MirServerHooks::create_prompt_session_listener(std::shared_ptr<miroil::PromptSessionListener>)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::MirServerHooks::operator()(mir::Server&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::MirServerHooks::the_display_configuration_controller() const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::MirServerHooks::the_mir_display() const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::MirServerHooks::the_prompt_session_listener() const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::MirServerHooks::the_prompt_session_manager() const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::OpenGLContext::OpenGLContext(mir::graphics::GLConfig*)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::OpenGLContext::operator()(mir::Server&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::OpenGLContext::the_open_gl_config() const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PersistDisplayConfig::PersistDisplayConfig(miroil::PersistDisplayConfig const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PersistDisplayConfig::PersistDisplayConfig(std::shared_ptr<miroil::DisplayConfigurationStorage> const&, std::function<std::shared_ptr<miroil::DisplayConfigurationPolicy> (std::shared_ptr<mir::graphics::DisplayConfigurationPolicy> const&)> const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PersistDisplayConfig::operator()(mir::Server&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PersistDisplayConfig::operator=(miroil::PersistDisplayConfig const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PersistDisplayConfig::~PersistDisplayConfig()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PromptSessionListener::~PromptSessionListener()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PromptSessionManager::PromptSessionManager(miroil::PromptSessionManager const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PromptSessionManager::PromptSessionManager(miroil::PromptSessionManager&&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PromptSessionManager::PromptSessionManager(std::shared_ptr<mir::scene::PromptSessionManager> const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PromptSessionManager::application_for(std::shared_ptr<mir::scene::PromptSession> const&) const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PromptSessionManager::operator==(miroil::PromptSessionManager const&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PromptSessionManager::resume_prompt_session(std::shared_ptr<mir::scene::PromptSession> const&) const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PromptSessionManager::stop_prompt_session(std::shared_ptr<mir::scene::PromptSession> const&) const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PromptSessionManager::suspend_prompt_session(std::shared_ptr<mir::scene::PromptSession> const&) const@MIROIL_1.0" 2.4.0
+ (c++)"miroil::PromptSessionManager::~PromptSessionManager()@MIROIL_1.0" 2.4.0
+ (c++)"miroil::SetCompositor::SetCompositor(std::function<std::shared_ptr<miroil::Compositor> ()>, std::function<void (std::shared_ptr<mir::graphics::Display> const&, std::shared_ptr<miroil::Compositor> const&, std::shared_ptr<mir::compositor::DisplayListener> const&)>)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::SetCompositor::operator()(mir::Server&)@MIROIL_1.0" 2.4.0
+ (c++)"miroil::dispatch_input_event(miral::Window const&, MirInputEvent const*)@MIROIL_1.0" 2.4.0
+ (c++)"typeinfo for miroil::Compositor@MIROIL_1.0" 2.4.0
+ (c++)"typeinfo for miroil::DisplayConfigurationPolicy@MIROIL_1.0" 2.4.0
+ (c++)"typeinfo for miroil::EventBuilder@MIROIL_1.0" 2.4.0
+ (c++)"typeinfo for miroil::InputDeviceObserver@MIROIL_1.0" 2.4.0
+ (c++)"typeinfo for miroil::PromptSessionListener@MIROIL_1.0" 2.4.0
+ (c++)"vtable for miroil::Compositor@MIROIL_1.0" 2.4.0
+ (c++)"vtable for miroil::DisplayConfigurationPolicy@MIROIL_1.0" 2.4.0
+ (c++)"vtable for miroil::EventBuilder@MIROIL_1.0" 2.4.0
+ (c++)"vtable for miroil::InputDeviceObserver@MIROIL_1.0" 2.4.0
+ (c++)"vtable for miroil::PromptSessionListener@MIROIL_1.0" 2.4.0
