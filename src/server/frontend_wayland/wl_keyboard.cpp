@@ -28,6 +28,7 @@
 #include "mir/input/xkb_mapper.h"
 #include "mir/log.h"
 #include "mir/fatal.h"
+#include "mir/events/keyboard_event.h"
 
 #include <xkbcommon/xkbcommon.h>
 #include <boost/throw_exception.hpp>
@@ -50,12 +51,6 @@ mf::WlKeyboard::WlKeyboard(
       context{xkb_context_new(XKB_CONTEXT_NO_FLAGS), &xkb_context_unref},
       acquire_current_keyboard_state{acquire_current_keyboard_state}
 {
-    // TODO: We should really grab the keymap for the focused surface when
-    // we receive focus.
-
-    // TODO: Maintain per-device keymaps, and send the appropriate map before
-    // sending an event from a keyboard with a different map.
-
     /* The wayland::Keyboard constructor has already run, creating the keyboard
      * resource. It is thus safe to send a keymap event to it; the client will receive
      * the keyboard object before this event.
@@ -78,6 +73,8 @@ mf::WlKeyboard::~WlKeyboard()
 
 void mf::WlKeyboard::event(MirKeyboardEvent const* event, WlSurface& surface)
 {
+    set_keymap(event->keymap());
+
     bool down;
     switch (mir_keyboard_event_action(event))
     {
