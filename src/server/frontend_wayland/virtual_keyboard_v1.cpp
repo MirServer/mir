@@ -19,6 +19,7 @@
 #include "virtual_keyboard_v1.h"
 #include "virtual-keyboard-unstable-v1_wrapper.h"
 #include "wayland_wrapper.h"
+#include "wayland_wrapper.h"
 #include "wl_seat.h"
 
 #include "mir/input/event_builder.h"
@@ -29,10 +30,14 @@
 #include "mir/input/touchscreen_settings.h"
 #include "mir/input/input_device_registry.h"
 #include "mir/input/input_device.h"
+#include "mir/input/device.h"
+#include "mir/input/mir_keyboard_config.h"
+#include "mir/input/buffer_keymap.h"
 #include "mir/fatal.h"
 #include "mir/log.h"
 
 #include <mutex>
+#include <cstring>
 
 namespace mf = mir::frontend;
 namespace mw = mir::wayland;
@@ -164,7 +169,8 @@ private:
     void modifiers(uint32_t mods_depressed, uint32_t mods_latched, uint32_t mods_locked, uint32_t group) override;
 
     std::shared_ptr<VirtualKeyboardV1Ctx> const ctx;
-    std::shared_ptr<VirtualKeyboardDevice> const device;
+    std::shared_ptr<VirtualKeyboardDevice> const keyboard_device;
+    std::shared_ptr<input::Device> const device_handle;
 };
 }
 }
@@ -173,9 +179,7 @@ auto mf::create_virtual_keyboard_manager_v1(
     wl_display* display,
     std::shared_ptr<mi::InputDeviceRegistry> const& device_registry) -> std::shared_ptr<VirtualKeyboardManagerV1Global>
 {
-    auto ctx = std::shared_ptr<VirtualKeyboardV1Ctx>{new VirtualKeyboardV1Ctx{
-        device_registry,
-    }};
+    auto ctx = std::shared_ptr<VirtualKeyboardV1Ctx>{new VirtualKeyboardV1Ctx{device_registry}};
     return std::make_shared<VirtualKeyboardManagerV1Global>(display, std::move(ctx));
 }
 
@@ -216,30 +220,70 @@ mf::VirtualKeyboardV1::VirtualKeyboardV1(
     std::shared_ptr<VirtualKeyboardV1Ctx> const& ctx)
     : wayland::VirtualKeyboardV1{resource, Version<1>()},
       ctx{ctx},
-      device{std::make_shared<VirtualKeyboardDevice>()}
+      keyboard_device{std::make_shared<VirtualKeyboardDevice>()},
+      device_handle{ctx->device_registry->add_device(keyboard_device)}
 {
     (void)seat;
-    ctx->device_registry->add_device(device);
 }
 
 mf::VirtualKeyboardV1::~VirtualKeyboardV1()
 {
-    ctx->device_registry->remove_device(device);
+    ctx->device_registry->remove_device(keyboard_device);
 }
 
 void mf::VirtualKeyboardV1::keymap(uint32_t format, mir::Fd fd, uint32_t size)
 {
-    (void)format;
-    (void)fd;
-    (void)size;
-    // TODO
-    log_info("Ignoring zwp_virtual_keyboard_v1.keymap()");
+    if (format != mw::Keyboard::KeymapFormat::xkb_v1)
+    {
+        BOOST_THROW_EXCEPTION(std::runtime_error("invalid keymap format " + std::to_string(format)));
+    }
+
+    std::vector<char> buffer(size);
+    char* current = buffer.data();
+    size_t remaining = size;
+    while (remaining > 0)
+    {
+        auto const result = read(fd, current, remaining);
+        if (result < 0)
+        {
+            BOOST_THROW_EXCEPTION(std::runtime_error(
+                "failed to read from keymap fd: " +
+                std::string{strerror(errno)}));
+        }
+        else if (result == 0)
+        {
+            BOOST_THROW_EXCEPTION(std::runtime_error(
+                "keymap fd hit EOF " +
+                std::to_string(remaining) +
+                " bytes before specified size"));
+        }
+        else
+        {
+            current += result;
+            remaining -= result;
+        }
+    }
+
+    // Keymaps seem to be null-terminated. It's unclear if they're supposed to be or not. Either way, BufferKeymap does
+    // not expect a null-terminated keymap
+    while (buffer.back() == '\0')
+    {
+        buffer.pop_back();
+    }
+
+    auto const keymap = std::make_shared<mi::BufferKeymap>(
+        "virtual-keyboard-keymap",
+        std::move(buffer),
+        XKB_KEYMAP_FORMAT_TEXT_V1);
+
+    MirKeyboardConfig const config{keymap};
+    device_handle->apply_keyboard_configuration(config);
 }
 
 void mf::VirtualKeyboardV1::key(uint32_t time, uint32_t key, uint32_t state)
 {
     (void)time;
-    device->use([&](input::InputSink* sink, input::EventBuilder* builder)
+    keyboard_device->use([&](input::InputSink* sink, input::EventBuilder* builder)
         {
             sink->handle_input(builder->key_event(std::chrono::nanoseconds{}, mir_keyboard_action(state), 0, key));
         });
