@@ -317,6 +317,7 @@ bool mircv::XKBMapper::XkbMappingState::update_and_map(MirEvent& event, mircv::X
     // TODO we should also indicate effective/consumed modifier state to properly
     // implement short cuts with keys that are only reachable via modifier keys
     key_ev.set_modifiers(expand_modifiers(modifier_state));
+    key_ev.set_keymap(keymap);
 
     return old_state != modifier_state;
 }
