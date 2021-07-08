@@ -50,7 +50,7 @@ mi::DefaultDevice::DefaultDevice(MirInputDeviceId id,
     if (contains(info.capabilities, mi::DeviceCapability::keyboard))
     {
         keyboard = MirKeyboardConfig{};
-        key_mapper->set_keymap_for_device(device_id, keyboard.value().device_keymap_shared());
+        key_mapper->set_keymap_for_device(device_id, keyboard.value().device_keymap());
     }
 }
 
@@ -220,11 +220,11 @@ void mi::DefaultDevice::set_keyboard_configuration(MirKeyboardConfig const& conf
     std::lock_guard<std::mutex> lock(config_mutex);
     if (!actions) // device is disabled
         return;
-    if (!keyboard.value().device_keymap().matches(conf.device_keymap()))
+    if (!keyboard.value().device_keymap()->matches(*conf.device_keymap()))
         keyboard = conf;
     else
         return;
-    key_mapper->set_keymap_for_device(device_id, conf.device_keymap_shared());
+    key_mapper->set_keymap_for_device(device_id, conf.device_keymap());
 }
 
 mir::optional_value<MirTouchscreenConfig> mi::DefaultDevice::touchscreen_configuration() const
