@@ -68,3 +68,13 @@ void MirKeyboardEvent::set_text(char const* str)
 {
     text_ = str;
 }
+
+std::shared_ptr<mir::input::Keymap> MirKeyboardEvent::keymap() const
+{
+    return keymap_;
+}
+
+void MirKeyboardEvent::set_keymap(std::shared_ptr<mir::input::Keymap> keymap)
+{
+    keymap_ = std::move(keymap);
+}

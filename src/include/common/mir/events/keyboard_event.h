@@ -21,8 +21,17 @@
 
 #include <cstdint>
 #include <string>
+#include <memory>
 
 #include "mir/events/input_event.h"
+
+namespace mir
+{
+namespace input
+{
+class Keymap;
+}
+}
 
 struct MirKeyboardEvent : MirInputEvent
 {
@@ -41,11 +50,15 @@ struct MirKeyboardEvent : MirInputEvent
     char const* text() const;
     void set_text(char const* str);
 
+    std::shared_ptr<mir::input::Keymap> keymap() const;
+    void set_keymap(std::shared_ptr<mir::input::Keymap> keymap);
+
 private:
     MirKeyboardAction action_ = {};
     int32_t keysym_ = 0;
     int32_t scan_code_ = 0;
     std::string text_ = {};
+    std::shared_ptr<mir::input::Keymap> keymap_;
 };
 
 #endif /* MIR_COMMON_KEYBOARD_EVENT_H_ */
