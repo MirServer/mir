@@ -66,29 +66,19 @@ MirKeyboardConfig& MirKeyboardConfig::operator=(MirKeyboardConfig const& other)
     return *this;
 }
 
-mi::Keymap const& MirKeyboardConfig::device_keymap() const
-{
-    return *impl->device_keymap;
-}
-
-mi::Keymap& MirKeyboardConfig::device_keymap()
-{
-    return *impl->device_keymap;
-}
-
 void MirKeyboardConfig::device_keymap(std::shared_ptr<mi::Keymap> keymap)
 {
     impl->device_keymap = std::move(keymap);
 }
 
-auto MirKeyboardConfig::device_keymap_shared() const -> std::shared_ptr<mir::input::Keymap> const&
+auto MirKeyboardConfig::device_keymap() const -> std::shared_ptr<mir::input::Keymap> const&
 {
     return impl->device_keymap;
 }
 
 bool MirKeyboardConfig::operator==(MirKeyboardConfig const& rhs) const
 {
-    return device_keymap().matches(rhs.device_keymap());
+    return impl->device_keymap->matches(*rhs.device_keymap());
 }
 
 bool MirKeyboardConfig::operator!=(MirKeyboardConfig const& rhs) const
@@ -98,5 +88,5 @@ bool MirKeyboardConfig::operator!=(MirKeyboardConfig const& rhs) const
 
 std::ostream& operator<<(std::ostream& out, MirKeyboardConfig const& keyboard)
 {
-    return out << keyboard.device_keymap().model() << " config";
+    return out << keyboard.device_keymap()->model() << " config";
 }
