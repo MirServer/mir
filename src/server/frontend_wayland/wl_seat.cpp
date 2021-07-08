@@ -238,7 +238,7 @@ void mf::WlSeat::Instance::get_keyboard(wl_resource* new_keyboard)
 {
     auto const keyboard = new WlKeyboard{
         new_keyboard,
-        *seat->keymap,
+        seat->keymap,
         [seat = seat->seat]()
         {
             std::unordered_set<uint32_t> pressed_keys;

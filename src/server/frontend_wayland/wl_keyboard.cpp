@@ -40,11 +40,12 @@ namespace mi = mir::input;
 
 mf::WlKeyboard::WlKeyboard(
     wl_resource* new_resource,
-    mir::input::Keymap const& initial_keymap,
+    std::shared_ptr<mi::Keymap> const& initial_keymap,
     std::function<std::vector<uint32_t>()> const& acquire_current_keyboard_state,
     bool enable_key_repeat)
     : Keyboard(new_resource, Version<6>()),
-      keymap{nullptr, &xkb_keymap_unref},
+      current_keymap{nullptr}, // will be set later in the constructor by set_keymap()
+      compiled_keymap{nullptr, &xkb_keymap_unref},
       state{nullptr, &xkb_state_unref},
       context{xkb_context_new(XKB_CONTEXT_NO_FLAGS), &xkb_context_unref},
       acquire_current_keyboard_state{acquire_current_keyboard_state}
@@ -188,7 +189,7 @@ void mf::WlKeyboard::focussed(WlSurface& surface, bool should_be_focused)
 void mf::WlKeyboard::update_keyboard_state(std::vector<uint32_t> const& keyboard_state)
 {
     // Rebuild xkb state
-    state = decltype(state)(xkb_state_new(keymap.get()), &xkb_state_unref);
+    state = decltype(state)(xkb_state_new(compiled_keymap.get()), &xkb_state_unref);
     for (auto scancode : keyboard_state)
     {
         xkb_state_update_key(state.get(), scancode + 8, XKB_KEY_DOWN);
@@ -197,14 +198,29 @@ void mf::WlKeyboard::update_keyboard_state(std::vector<uint32_t> const& keyboard
     update_modifier_state();
 }
 
-void mf::WlKeyboard::set_keymap(mi::Keymap const& new_keymap)
+void mf::WlKeyboard::set_keymap(std::shared_ptr<mi::Keymap> const& new_keymap)
 {
-    keymap = new_keymap.make_unique_xkb_keymap(context.get());
+    if (!new_keymap || new_keymap == current_keymap)
+    {
+        return;
+    }
+
+    if (current_keymap && current_keymap->matches(*new_keymap))
+    {
+        current_keymap = new_keymap;
+        return;
+    }
+
+    current_keymap = new_keymap;
+    compiled_keymap = new_keymap->make_unique_xkb_keymap(context.get());
 
     // TODO: We might need to copy across the existing depressed keys?
-    state = decltype(state)(xkb_state_new(keymap.get()), &xkb_state_unref);
+    state = decltype(state)(xkb_state_new(compiled_keymap.get()), &xkb_state_unref);
 
-    std::unique_ptr<char, void(*)(void*)> buffer{xkb_keymap_get_as_string(keymap.get(), XKB_KEYMAP_FORMAT_TEXT_V1), free};
+    std::unique_ptr<char, void(*)(void*)> buffer{xkb_keymap_get_as_string(
+        compiled_keymap.get(),
+        XKB_KEYMAP_FORMAT_TEXT_V1),
+        free};
     auto length = strlen(buffer.get());
 
     mir::AnonymousShmFile shm_buffer{length};
