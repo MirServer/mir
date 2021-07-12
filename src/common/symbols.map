@@ -199,6 +199,8 @@ MIR_COMMON_2.5 {
     MirKeyboardEvent::set_text*;
     MirKeyboardEvent::source_id*;
     MirKeyboardEvent::text*;
+    MirKeyboardEvent::keymap*;
+    MirKeyboardEvent::set_keymap*;
     MirKeymapEvent::MirKeymapEvent*;
     MirKeymapEvent::buffer*;
     MirKeymapEvent::device_id*;
