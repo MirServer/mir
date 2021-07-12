@@ -159,7 +159,7 @@ struct miral::Keymap::Self : mir::input::InputDeviceObserver
         auto const keyboard_config = keyboard->keyboard_configuration();
         if (keyboard_config.is_set())
         {
-            model = keyboard_config.value().device_keymap().model();
+            model = keyboard_config.value().device_keymap()->model();
         }
         std::shared_ptr<mi::Keymap> keymap{std::make_shared<mi::ParameterKeymap>(model, layout, variant, options)};
         keyboard->apply_keyboard_configuration(std::move(keymap));

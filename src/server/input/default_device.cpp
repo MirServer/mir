@@ -220,7 +220,7 @@ void mi::DefaultDevice::set_keyboard_configuration(MirKeyboardConfig const& conf
     std::lock_guard<std::mutex> lock(config_mutex);
     if (!actions) // device is disabled
         return;
-    if (!keyboard.value().device_keymap().matches(conf.device_keymap()))
+    if (!keyboard.value().device_keymap()->matches(*conf.device_keymap()))
         keyboard = conf;
     else
         return;

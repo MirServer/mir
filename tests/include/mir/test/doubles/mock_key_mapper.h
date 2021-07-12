@@ -33,10 +33,8 @@ namespace doubles
 struct MockKeyMapper : input::KeyMapper
 {
     MOCK_METHOD2(set_key_state, void(MirInputDeviceId id, std::vector<uint32_t> const& key_state));
-    MOCK_METHOD2(set_keymap_for_device, void(MirInputDeviceId id, input::Keymap const& map));
-    MOCK_METHOD3(set_keymap_for_device, void(MirInputDeviceId id, char const* buffer, size_t len));
-    MOCK_METHOD1(set_keymap_for_all_devices, void(input::Keymap const& map));
-    MOCK_METHOD2(set_keymap_for_all_devices, void(char const* buffer, size_t len));
+    MOCK_METHOD2(set_keymap_for_device, void(MirInputDeviceId id, std::shared_ptr<input::Keymap> map));
+    MOCK_METHOD1(set_keymap_for_all_devices, void(std::shared_ptr<input::Keymap> map));
     MOCK_METHOD1(clear_keymap_for_device, void(MirInputDeviceId id));
     MOCK_METHOD0(clear_all_keymaps, void());
     MOCK_METHOD1(map_event, void(MirEvent& event));
