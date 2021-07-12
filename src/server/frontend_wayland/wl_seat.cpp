@@ -106,7 +106,7 @@ void mf::WlSeat::ConfigObserver::device_added(std::shared_ptr<input::Device> con
 {
     if (auto keyboard_config = device->keyboard_configuration())
     {
-        pending_keymap = keyboard_config.value().device_keymap_shared();
+        pending_keymap = keyboard_config.value().device_keymap();
     }
 }
 
@@ -114,7 +114,7 @@ void mf::WlSeat::ConfigObserver::device_changed(std::shared_ptr<input::Device> c
 {
     if (auto keyboard_config = device->keyboard_configuration())
     {
-        pending_keymap = keyboard_config.value().device_keymap_shared();
+        pending_keymap = keyboard_config.value().device_keymap();
     }
 }
 
@@ -238,7 +238,7 @@ void mf::WlSeat::Instance::get_keyboard(wl_resource* new_keyboard)
 {
     auto const keyboard = new WlKeyboard{
         new_keyboard,
-        *seat->keymap,
+        seat->keymap,
         [seat = seat->seat]()
         {
             std::unordered_set<uint32_t> pressed_keys;

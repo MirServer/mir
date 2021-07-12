@@ -51,7 +51,7 @@ class WlKeyboard : public wayland::Keyboard
 public:
     WlKeyboard(
         wl_resource* new_resource,
-        mir::input::Keymap const& initial_keymap,
+        std::shared_ptr<mir::input::Keymap> const& initial_keymap,
         std::function<std::vector<uint32_t>()> const& acquire_current_keyboard_state,
         bool enable_key_repeat);
 
@@ -62,11 +62,12 @@ public:
     void resync_keyboard();
 
 private:
-    void set_keymap(mir::input::Keymap const& new_keymap);
+    void set_keymap(std::shared_ptr<mir::input::Keymap> const& new_keymap);
     void update_modifier_state();
     void update_keyboard_state(std::vector<uint32_t> const& keyboard_state);
 
-    std::unique_ptr<xkb_keymap, void (*)(xkb_keymap *)> keymap;
+    std::shared_ptr<mir::input::Keymap> current_keymap;
+    std::unique_ptr<xkb_keymap, void (*)(xkb_keymap *)> compiled_keymap;
     std::unique_ptr<xkb_state, void (*)(xkb_state *)> state;
     std::unique_ptr<xkb_context, void (*)(xkb_context *)> const context;
 
