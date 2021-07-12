@@ -196,7 +196,7 @@ mi::DefaultInputDeviceHub::DefaultInputDeviceHub(
     input_dispatchable->add_watch(device_queue);
 }
 
-void mi::DefaultInputDeviceHub::add_device(std::shared_ptr<InputDevice> const& device)
+auto mi::DefaultInputDeviceHub::add_device(std::shared_ptr<InputDevice> const& device) -> std::shared_ptr<Device>
 {
     if (!device)
         BOOST_THROW_EXCEPTION(std::invalid_argument("Invalid input device"));
@@ -213,7 +213,7 @@ void mi::DefaultInputDeviceHub::add_device(std::shared_ptr<InputDevice> const& d
     if (it == end(devices))
     {
         auto queue = std::make_shared<dispatch::ActionQueue>();
-        auto handle = restore_or_create_device(lock, *device, queue);
+        auto const handle = restore_or_create_device(lock, *device, queue);
         // send input device info to observer loop..
         devices.push_back(std::make_unique<RegisteredDevice>(
             device, handle->id(), queue, cookie_authority, handle));
@@ -223,6 +223,7 @@ void mi::DefaultInputDeviceHub::add_device(std::shared_ptr<InputDevice> const& d
 
         seat->add_device(*handle);
         dev->start(seat, input_dispatchable);
+        return handle;
     }
     else
     {

@@ -90,7 +90,7 @@ public:
                           std::shared_ptr<ServerStatusListener> const& server_status_listener);
 
     // InputDeviceRegistry - calls from mi::Platform
-    void add_device(std::shared_ptr<InputDevice> const& device) override;
+    auto add_device(std::shared_ptr<InputDevice> const& device) -> std::shared_ptr<Device> override;
     void remove_device(std::shared_ptr<InputDevice> const& device) override;
 
     // InputDeviceHub - calls from server components / shell
