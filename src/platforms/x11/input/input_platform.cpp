@@ -381,9 +381,7 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
     case XCB_KEY_PRESS:
     {
         auto const press_ev = reinterpret_cast<xcb_key_press_event_t*>(event);
-        auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::milliseconds{press_ev->time});
-        key_pressed(event_time, press_ev->detail);
+        key_pressed(std::chrono::milliseconds{press_ev->time}, press_ev->detail);
     }   break;
 
     case XCB_KEY_RELEASE:
@@ -405,9 +403,7 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
                     }
                 }
 
-                auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                    std::chrono::milliseconds{time});
-                key_released(event_time, xcb_keycode);
+                key_released(std::chrono::milliseconds{time}, xcb_keycode);
                 return false; // do not consume next event, process it normally
             };
     }   break;
@@ -416,8 +412,7 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
     {
         auto const press_ev = reinterpret_cast<xcb_button_press_event_t*>(event);
 
-        auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::milliseconds{press_ev->time});
+        auto const event_time = std::chrono::milliseconds{press_ev->time};
         auto const pos = get_pos_on_output(x11_resources.get(), press_ev->event, press_ev->event_x, press_ev->event_y);
         core_pointer->update_button_state(press_ev->state);
 
@@ -459,8 +454,7 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
             break;
 
         default:
-            auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                std::chrono::milliseconds{release_ev->time});
+            auto const event_time = std::chrono::milliseconds{release_ev->time};
             auto const pos = get_pos_on_output(
                 x11_resources.get(),
                 release_ev->event,
@@ -474,8 +468,7 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
     {
         auto const motion_ev = reinterpret_cast<xcb_motion_notify_event_t*>(event);
         core_pointer->update_button_state(motion_ev->state);
-        auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                std::chrono::milliseconds{motion_ev->time});
+        auto const event_time = std::chrono::milliseconds{motion_ev->time};
         auto pos = get_pos_on_output(x11_resources.get(), motion_ev->event, motion_ev->event_x, motion_ev->event_y);
         core_pointer->pointer_motion(event_time, pos, {});
     }   break;
@@ -549,8 +542,7 @@ void mix::XInputPlatform::process_xkb_event(xcb_generic_event_t* event)
         {
             modifiers.insert(state_ev->keycode);
         }
-        auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::milliseconds{state_ev->time});
+        auto const event_time = std::chrono::milliseconds{state_ev->time};
         switch (state_ev->eventType)
         {
         case XCB_KEY_PRESS:
