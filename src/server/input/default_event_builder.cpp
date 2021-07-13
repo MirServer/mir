@@ -56,7 +56,7 @@ void mi::DefaultEventBuilder::calibrate_timestamps(bool enable)
 }
 
 mir::EventUPtr mi::DefaultEventBuilder::key_event(
-    Timestamp source_timestamp,
+    std::optional<Timestamp> source_timestamp,
     MirKeyboardAction action,
     xkb_keysym_t keysym,
     int scan_code)
@@ -68,7 +68,7 @@ mir::EventUPtr mi::DefaultEventBuilder::key_event(
 }
 
 mir::EventUPtr mi::DefaultEventBuilder::pointer_event(
-    Timestamp source_timestamp,
+    std::optional<Timestamp> source_timestamp,
     MirPointerAction action,
     MirPointerButtons buttons_pressed,
     float hscroll_value, float vscroll_value,
@@ -90,7 +90,7 @@ mir::EventUPtr mi::DefaultEventBuilder::pointer_event(
 }
 
 mir::EventUPtr mi::DefaultEventBuilder::pointer_event(
-    Timestamp source_timestamp,
+    std::optional<Timestamp> source_timestamp,
     MirPointerAction action,
     MirPointerButtons buttons_pressed,
     float x_axis, float y_axis,
@@ -110,7 +110,7 @@ mir::EventUPtr mi::DefaultEventBuilder::pointer_event(
 }
 
 mir::EventUPtr mi::DefaultEventBuilder::touch_event(
-    Timestamp source_timestamp,
+    std::optional<Timestamp> source_timestamp,
     std::vector<events::ContactState> const& contacts)
 {
     std::vector<uint8_t> vec_cookie{};
@@ -127,14 +127,18 @@ mir::EventUPtr mi::DefaultEventBuilder::touch_event(
     return me::make_touch_event(device_id, timestamp, vec_cookie, mir_input_event_modifier_none, contacts);
 }
 
-auto mi::DefaultEventBuilder::calibrate_timestamp(Timestamp timestamp) -> Timestamp
+auto mi::DefaultEventBuilder::calibrate_timestamp(std::optional<Timestamp> timestamp) -> Timestamp
 {
+    if (!timestamp)
+    {
+        return clock->now().time_since_epoch();
+    }
     auto offset = timestamp_offset.load();
     if (offset == Timestamp::max())
     {
         // If used from multiple threads this could happen multiple times at once, but that's not a problem
-        offset = clock->now().time_since_epoch() - timestamp;
+        offset = clock->now().time_since_epoch() - timestamp.value();
         timestamp_offset.store(offset);
     }
-    return timestamp + offset;
+    return timestamp.value() + offset;
 }
