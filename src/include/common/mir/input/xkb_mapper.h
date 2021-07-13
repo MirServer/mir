@@ -22,6 +22,7 @@
 #define MIR_INPUT_RECEIVER_XKB_MAPPER_H_
 
 #include "mir/input/key_mapper.h"
+#include "mir/input/keymap.h"
 #include "mir/optional_value.h"
 
 #include <xkbcommon/xkbcommon.h>
@@ -38,9 +39,6 @@ namespace input
 using XKBContextPtr = std::unique_ptr<xkb_context, void(*)(xkb_context*)>;
 XKBContextPtr make_unique_context();
 
-using XKBKeymapPtr = std::unique_ptr<xkb_keymap, void(*)(xkb_keymap*)>;
-XKBKeymapPtr make_unique_keymap(xkb_context* context, char const* buffer, size_t size);
-
 using XKBStatePtr = std::unique_ptr<xkb_state, void(*)(xkb_state*)>;
 using XKBComposeTablePtr = std::unique_ptr<xkb_compose_table, void(*)(xkb_compose_table*)>;
 using XKBComposeStatePtr = std::unique_ptr<xkb_compose_state, void(*)(xkb_compose_state*)>;
@@ -54,10 +52,8 @@ public:
     XKBMapper();
 
     void set_key_state(MirInputDeviceId id, std::vector<uint32_t> const& key_state) override;
-    void set_keymap_for_device(MirInputDeviceId id, Keymap const& map) override;
-    void set_keymap_for_device(MirInputDeviceId id, char const* buffer, size_t len) override;
-    void set_keymap_for_all_devices(Keymap const& map) override;
-    void set_keymap_for_all_devices(char const* buffer, size_t len) override;
+    void set_keymap_for_device(MirInputDeviceId id, std::shared_ptr<Keymap> map) override;
+    void set_keymap_for_all_devices(std::shared_ptr<Keymap> map) override;
     void clear_keymap_for_device(MirInputDeviceId id) override;
     void clear_all_keymaps() override;
     void map_event(MirEvent& event) override;
@@ -69,8 +65,8 @@ protected:
     XKBMapper& operator=(XKBMapper const&) = delete;
 
 private:
-    void set_keymap(MirInputDeviceId id, XKBKeymapPtr map);
-    void set_keymap(XKBKeymapPtr map);
+    void set_keymap(MirInputDeviceId id, std::shared_ptr<Keymap> new_keymap);
+    void set_keymap(std::shared_ptr<Keymap> new_keymap);
     void update_modifier();
 
     std::mutex mutable guard;
@@ -87,7 +83,7 @@ private:
 
     struct XkbMappingState
     {
-        explicit XkbMappingState(std::shared_ptr<xkb_keymap> const& keymap);
+        explicit XkbMappingState(std::shared_ptr<Keymap> keymap, std::shared_ptr<xkb_keymap> compiled_keymap);
         void set_key_state(std::vector<uint32_t> const& key_state);
 
         bool update_and_map(MirEvent& event, ComposeState* compose_state);
@@ -97,7 +93,8 @@ private:
         void press_modifier(MirInputEventModifiers mod);
         void release_modifier(MirInputEventModifiers mod);
 
-        std::shared_ptr<xkb_keymap> const keymap;
+        std::shared_ptr<Keymap> const keymap;
+        std::shared_ptr<xkb_keymap> const compiled_keymap;
         XKBStatePtr state;
         MirInputEventModifiers modifier_state{0};
     };
@@ -106,7 +103,8 @@ private:
     ComposeState* get_compose_state(MirInputDeviceId id);
 
     XKBContextPtr context;
-    std::shared_ptr<xkb_keymap> default_keymap;
+    std::shared_ptr<Keymap> default_keymap;
+    std::shared_ptr<xkb_keymap> default_compiled_keymap;
     XKBComposeTablePtr compose_table;
 
     mir::optional_value<MirInputEventModifiers> modifier_state;

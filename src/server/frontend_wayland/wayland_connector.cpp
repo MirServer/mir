@@ -494,6 +494,7 @@ mf::WaylandConnector::WaylandConnector(
     std::shared_ptr<MirDisplay> const& display_config,
     std::shared_ptr<mi::InputDeviceHub> const& input_hub,
     std::shared_ptr<mi::Seat> const& seat,
+    std::shared_ptr<mi::InputDeviceRegistry> const& input_device_registry,
     std::shared_ptr<mg::GraphicBufferAllocator> const& allocator,
     std::shared_ptr<mf::SessionAuthorizer> const& session_authorizer,
     std::shared_ptr<SurfaceStack> const& surface_stack,
@@ -561,7 +562,8 @@ mf::WaylandConnector::WaylandConnector(
         clipboard,
         seat_global.get(),
         output_manager.get(),
-        surface_stack});
+        surface_stack,
+        input_device_registry});
 
     wl_display_init_shm(display.get());
 

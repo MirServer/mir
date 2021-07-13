@@ -31,7 +31,7 @@ namespace doubles
 {
 struct MockInputDeviceRegistry : input::InputDeviceRegistry
 {
-    MOCK_METHOD1(add_device,void (std::shared_ptr<input::InputDevice> const&));
+    MOCK_METHOD1(add_device, std::shared_ptr<input::Device>(std::shared_ptr<input::InputDevice> const&));
     MOCK_METHOD1(remove_device, void(std::shared_ptr<input::InputDevice> const&));
 
 };

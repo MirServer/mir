@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014-2015 Canonical Ltd.
+ * Copyright © 2016 Canonical Ltd.
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version 2 or 3,
@@ -17,33 +17,39 @@
  *   Andreas Pokorny <andreas.pokorny@canonical.com>
  */
 
-#ifndef MIR_INPUT_INPUT_DEVICE_REGISTRY_H_
-#define MIR_INPUT_INPUT_DEVICE_REGISTRY_H_
+#ifndef MIR_INPUT_BUFFER_KEYMAP_H_
+#define MIR_INPUT_BUFFER_KEYMAP_H_
 
+#include "keymap.h"
+
+#include <vector>
+#include <string>
 #include <memory>
+#include <xkbcommon/xkbcommon.h>
 
 namespace mir
 {
 namespace input
 {
-class Device;
-class InputDevice;
 
-class InputDeviceRegistry
+class BufferKeymap
+    : public Keymap
 {
 public:
-    InputDeviceRegistry() = default;
-    virtual ~InputDeviceRegistry() = default;
+    BufferKeymap(std::string name, std::vector<char> buffer, xkb_keymap_format format);
 
-    virtual auto add_device(std::shared_ptr<InputDevice> const& device) -> std::shared_ptr<Device> = 0;
-    virtual void remove_device(std::shared_ptr<InputDevice> const& device) = 0;
-protected:
-    InputDeviceRegistry(InputDeviceRegistry const&) = delete;
-    InputDeviceRegistry& operator=(InputDeviceRegistry const&) = delete;
+    auto matches(Keymap const& other) const -> bool override;
+    auto model() const -> std::string override;
+    auto make_unique_xkb_keymap(xkb_context* context) const -> XKBKeymapPtr override;
 
+private:
+    std::string const name;
+    std::vector<char> const buffer;
+    xkb_keymap_format const format;
 };
 
 }
 }
 
-#endif
+#endif // MIR_INPUT_BUFFER_KEYMAP_H_
+
