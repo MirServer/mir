@@ -20,7 +20,6 @@
 #include "virtual-keyboard-unstable-v1_wrapper.h"
 #include "wayland_wrapper.h"
 #include "wayland_wrapper.h"
-#include "wl_seat.h"
 
 #include "mir/input/event_builder.h"
 #include "mir/input/input_sink.h"
@@ -203,7 +202,7 @@ class VirtualKeyboardV1
     : public wayland::VirtualKeyboardV1
 {
 public:
-    VirtualKeyboardV1(wl_resource* resource, WlSeat& seat, std::shared_ptr<VirtualKeyboardV1Ctx> const& ctx);
+    VirtualKeyboardV1(wl_resource* resource, std::shared_ptr<VirtualKeyboardV1Ctx> const& ctx);
     ~VirtualKeyboardV1();
 
 private:
@@ -249,24 +248,18 @@ mf::VirtualKeyboardManagerV1::VirtualKeyboardManagerV1(
 
 void mf::VirtualKeyboardManagerV1::create_virtual_keyboard(struct wl_resource* seat, struct wl_resource* id)
 {
-    auto const wl_seat = WlSeat::from(seat);
-    if (!wl_seat)
-    {
-        fatal_error("create_virtual_keyboard() received invalid wl_seat");
-    }
-    new VirtualKeyboardV1{id, *wl_seat, ctx};
+    (void)seat;
+    new VirtualKeyboardV1{id, ctx};
 }
 
 mf::VirtualKeyboardV1::VirtualKeyboardV1(
     wl_resource* resource,
-    WlSeat& seat,
     std::shared_ptr<VirtualKeyboardV1Ctx> const& ctx)
     : wayland::VirtualKeyboardV1{resource, Version<1>()},
       ctx{ctx},
       keyboard_device{std::make_shared<VirtualKeyboardDevice>()},
       device_handle{ctx->device_registry->add_device(keyboard_device)}
 {
-    (void)seat;
 }
 
 mf::VirtualKeyboardV1::~VirtualKeyboardV1()
@@ -300,6 +293,6 @@ void mf::VirtualKeyboardV1::modifiers(
     (void)mods_latched;
     (void)mods_locked;
     (void)group;
-    // TODO
     log_info("Ignoring zwp_virtual_keyboard_v1.modifiers()");
+    // Currently we keep track of and send modifiers in the Wayland frontend, so handling this is not needed
 }
