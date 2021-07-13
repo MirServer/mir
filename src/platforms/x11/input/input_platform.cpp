@@ -318,7 +318,8 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
             // Only release keys that aren't modifiers
             if (modifiers.find(key) == modifiers.end())
             {
-                key_released(key, last_timestamp);
+                // FOCUS_OUT doesn't have a timestamp
+                key_released(std::nullopt, key);
             }
         }
 
@@ -336,7 +337,6 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
     case XCB_ENTER_NOTIFY:
     {
         auto const enter_ev = reinterpret_cast<xcb_enter_notify_event_t*>(event);
-        last_timestamp = enter_ev->time;
 
         if (!ptr_grabbed && kbd_grabbed)
         {
@@ -369,7 +369,6 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
     case XCB_LEAVE_NOTIFY:
     {
         auto const leave_ev = reinterpret_cast<xcb_leave_notify_event_t*>(event);
-        last_timestamp = leave_ev->time;
 
         if (ptr_grabbed)
         {
@@ -382,14 +381,14 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
     case XCB_KEY_PRESS:
     {
         auto const press_ev = reinterpret_cast<xcb_key_press_event_t*>(event);
-        last_timestamp = press_ev->time;
-        key_pressed(press_ev->detail, press_ev->time);
+        auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::milliseconds{press_ev->time});
+        key_pressed(event_time, press_ev->detail);
     }   break;
 
     case XCB_KEY_RELEASE:
     {
         auto const release_ev = reinterpret_cast<xcb_key_release_event_t*>(event);
-        last_timestamp = release_ev->time;
 
         // Key repeats look like a release and an immediate press with the same timestamp. The only way to detect and
         // discard them is by peaking at the next event.
@@ -406,7 +405,9 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
                     }
                 }
 
-                key_released(xcb_keycode, time);
+                auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    std::chrono::milliseconds{time});
+                key_released(event_time, xcb_keycode);
                 return false; // do not consume next event, process it normally
             };
     }   break;
@@ -414,7 +415,6 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
     case XCB_BUTTON_PRESS:
     {
         auto const press_ev = reinterpret_cast<xcb_button_press_event_t*>(event);
-        last_timestamp = press_ev->time;
 
         auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::milliseconds{press_ev->time});
@@ -447,7 +447,6 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
     case XCB_BUTTON_RELEASE:
     {
         auto const release_ev = reinterpret_cast<xcb_button_release_event_t*>(event);
-        last_timestamp = release_ev->time;
 
         core_pointer->update_button_state(release_ev->state);
 
@@ -474,7 +473,6 @@ void mix::XInputPlatform::process_input_event(xcb_generic_event_t* event)
     case XCB_MOTION_NOTIFY:
     {
         auto const motion_ev = reinterpret_cast<xcb_motion_notify_event_t*>(event);
-        last_timestamp = motion_ev->time;
         core_pointer->update_button_state(motion_ev->state);
         auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
                 std::chrono::milliseconds{motion_ev->time});
@@ -551,14 +549,16 @@ void mix::XInputPlatform::process_xkb_event(xcb_generic_event_t* event)
         {
             modifiers.insert(state_ev->keycode);
         }
+        auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::milliseconds{state_ev->time});
         switch (state_ev->eventType)
         {
         case XCB_KEY_PRESS:
-            key_pressed(state_ev->keycode, state_ev->time);
+            key_pressed(event_time, state_ev->keycode);
             break;
 
         case XCB_KEY_RELEASE:
-            key_released(state_ev->keycode, state_ev->time);
+            key_released(event_time, state_ev->keycode);
             break;
 
         default:;
@@ -569,24 +569,20 @@ void mix::XInputPlatform::process_xkb_event(xcb_generic_event_t* event)
     }
 }
 
-void mix::XInputPlatform::key_pressed(xcb_keycode_t xcb_keycode, xcb_timestamp_t timestamp)
+void mix::XInputPlatform::key_pressed(std::optional<std::chrono::nanoseconds> event_time, xcb_keycode_t xcb_keycode)
 {
     if (pressed_keys.insert(xcb_keycode).second)
     {
-        auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::milliseconds{timestamp});
         xkb_keysym_t const keysym = xkb_state_key_get_one_sym(key_state, xcb_keycode);
         auto const scan_code = xcb_keycode_get_scan_code(xcb_keycode);
         core_keyboard->key_press(event_time, keysym, scan_code);
     }
 }
 
-void mix::XInputPlatform::key_released(xcb_keycode_t xcb_keycode, xcb_timestamp_t timestamp)
+void mix::XInputPlatform::key_released(std::optional<std::chrono::nanoseconds> event_time, xcb_keycode_t xcb_keycode)
 {
     if (pressed_keys.erase(xcb_keycode))
     {
-        auto const event_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::milliseconds{timestamp});
         xkb_keysym_t keysym = xkb_state_key_get_one_sym(key_state, xcb_keycode);
         auto const scan_code = xcb_keycode_get_scan_code(xcb_keycode);
         core_keyboard->key_release(event_time, keysym, scan_code);

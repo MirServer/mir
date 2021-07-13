@@ -137,7 +137,7 @@ bool mix::XInputDevice::started() const
     return sink && builder;
 }
 
-void mix::XInputDevice::key_press(std::chrono::nanoseconds event_time, xkb_keysym_t keysym, int scan_code)
+void mix::XInputDevice::key_press(EventTime event_time, xkb_keysym_t keysym, int scan_code)
 {
     sink->handle_input(builder->key_event(
         event_time,
@@ -147,7 +147,7 @@ void mix::XInputDevice::key_press(std::chrono::nanoseconds event_time, xkb_keysy
 
 }
 
-void mix::XInputDevice::key_release(std::chrono::nanoseconds event_time, xkb_keysym_t keysym, int scan_code)
+void mix::XInputDevice::key_release(EventTime event_time, xkb_keysym_t keysym, int scan_code)
 {
     sink->handle_input(builder->key_event(
         event_time,
@@ -162,7 +162,7 @@ void mix::XInputDevice::update_button_state(int button)
 }
 
 void mix::XInputDevice::pointer_press(
-    std::chrono::nanoseconds event_time,
+    EventTime event_time,
     int button,
     mir::geometry::PointF pos,
     mir::geometry::DisplacementF scroll)
@@ -186,7 +186,7 @@ void mix::XInputDevice::pointer_press(
 }
 
 void mix::XInputDevice::pointer_release(
-    std::chrono::nanoseconds event_time,
+    EventTime event_time,
     int button,
     mir::geometry::PointF pos,
     mir::geometry::DisplacementF scroll)
@@ -211,7 +211,7 @@ void mix::XInputDevice::pointer_release(
 }
 
 void mix::XInputDevice::pointer_motion(
-    std::chrono::nanoseconds event_time,
+    EventTime event_time,
     mir::geometry::PointF pos,
     mir::geometry::DisplacementF scroll)
 {
