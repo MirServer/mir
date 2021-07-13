@@ -70,6 +70,49 @@ auto mir_keyboard_action(uint32_t wayland_state) -> MirKeyboardAction
             "Invalid virtual keyboard key state " + std::to_string(wayland_state)));
     }
 }
+
+auto load_keymap(uint32_t format, mir::Fd fd, size_t size) -> std::shared_ptr<mi::Keymap>
+{
+    if (format != mw::Keyboard::KeymapFormat::xkb_v1)
+    {
+        BOOST_THROW_EXCEPTION(std::runtime_error("invalid keymap format " + std::to_string(format)));
+    }
+
+    std::vector<char> buffer(size);
+    char* current = buffer.data();
+    size_t remaining = size;
+    while (remaining > 0)
+    {
+        auto const result = read(fd, current, remaining);
+        if (result < 0)
+        {
+            BOOST_THROW_EXCEPTION(std::runtime_error(
+                "failed to read from keymap fd: " +
+                std::string{strerror(errno)}));
+        }
+        else if (result == 0)
+        {
+            BOOST_THROW_EXCEPTION(std::runtime_error(
+                "keymap fd hit EOF " +
+                std::to_string(remaining) +
+                " bytes before specified size"));
+        }
+        else
+        {
+            current += result;
+            remaining -= result;
+        }
+    }
+
+    // Keymaps seem to be null-terminated. It's unclear if they're supposed to be or not. Either way, BufferKeymap does
+    // not expect a null-terminated keymap
+    while (buffer.back() == '\0')
+    {
+        buffer.pop_back();
+    }
+
+    return std::make_shared<mi::BufferKeymap>("virtual-keyboard-keymap", std::move(buffer), XKB_KEYMAP_FORMAT_TEXT_V1);
+}
 }
 
 namespace mir
@@ -233,50 +276,8 @@ mf::VirtualKeyboardV1::~VirtualKeyboardV1()
 
 void mf::VirtualKeyboardV1::keymap(uint32_t format, mir::Fd fd, uint32_t size)
 {
-    if (format != mw::Keyboard::KeymapFormat::xkb_v1)
-    {
-        BOOST_THROW_EXCEPTION(std::runtime_error("invalid keymap format " + std::to_string(format)));
-    }
-
-    std::vector<char> buffer(size);
-    char* current = buffer.data();
-    size_t remaining = size;
-    while (remaining > 0)
-    {
-        auto const result = read(fd, current, remaining);
-        if (result < 0)
-        {
-            BOOST_THROW_EXCEPTION(std::runtime_error(
-                "failed to read from keymap fd: " +
-                std::string{strerror(errno)}));
-        }
-        else if (result == 0)
-        {
-            BOOST_THROW_EXCEPTION(std::runtime_error(
-                "keymap fd hit EOF " +
-                std::to_string(remaining) +
-                " bytes before specified size"));
-        }
-        else
-        {
-            current += result;
-            remaining -= result;
-        }
-    }
-
-    // Keymaps seem to be null-terminated. It's unclear if they're supposed to be or not. Either way, BufferKeymap does
-    // not expect a null-terminated keymap
-    while (buffer.back() == '\0')
-    {
-        buffer.pop_back();
-    }
-
-    auto const keymap = std::make_shared<mi::BufferKeymap>(
-        "virtual-keyboard-keymap",
-        std::move(buffer),
-        XKB_KEYMAP_FORMAT_TEXT_V1);
-
-    MirKeyboardConfig const config{keymap};
+    auto keymap = load_keymap(format, std::move(fd), size);
+    MirKeyboardConfig const config{std::move(keymap)};
     device_handle->apply_keyboard_configuration(config);
 }
 
