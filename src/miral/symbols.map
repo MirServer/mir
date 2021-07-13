@@ -451,9 +451,9 @@ MIRAL_3.3 {
 global:
   extern "C++" {
     miral::PrintTo*;
+    miral::WaylandExtensions::zwp_virtual_keyboard_manager_v1*;
     miral::WindowInfo::focus_mode*;
     miral::WindowSpecification::focus_mode*;
     miral::toolkit::mir_keyboard_event_keysym*;
-    miral::WaylandExtensions::zwp_virtual_keyboard_manager_v1*;
   };
 } MIRAL_3.2;
