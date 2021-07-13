@@ -276,10 +276,10 @@ void mf::VirtualKeyboardV1::keymap(uint32_t format, mir::Fd fd, uint32_t size)
 
 void mf::VirtualKeyboardV1::key(uint32_t time, uint32_t key, uint32_t state)
 {
-    (void)time;
+    std::chrono::nanoseconds nano = std::chrono::milliseconds{time};
     keyboard_device->use([&](input::InputSink* sink, input::EventBuilder* builder)
         {
-            sink->handle_input(builder->key_event(std::chrono::nanoseconds{}, mir_keyboard_action(state), 0, key));
+            sink->handle_input(builder->key_event(nano, mir_keyboard_action(state), 0, key));
         });
 }
 
