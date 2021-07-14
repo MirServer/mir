@@ -324,6 +324,9 @@ void mtf::FakeInputDeviceImpl::InputDevice::map_touch_coordinates(float& x, floa
 
 void mtf::FakeInputDeviceImpl::InputDevice::start(mi::InputSink* destination, mi::EventBuilder* event_builder)
 {
+    // We keep track of events based on their timestamps, so we can't have those being modified
+    event_builder->calibrate_timestamps(false);
+
     sink = destination;
     builder = event_builder;
     mtf::StubInputPlatform::register_dispatchable(queue);

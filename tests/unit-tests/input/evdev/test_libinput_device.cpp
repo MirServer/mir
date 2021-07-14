@@ -32,6 +32,7 @@
 #include "mir/test/doubles/mock_libinput.h"
 #include "mir/test/doubles/mock_input_seat.h"
 #include "mir/test/doubles/mock_input_sink.h"
+#include "mir/test/doubles/advanceable_clock.h"
 #include "mir/test/gmock_fixes.h"
 #include "mir/test/fake_shared.h"
 #include "mir/udev/wrapper.h"
@@ -70,7 +71,12 @@ struct MockEventBuilder : mi::EventBuilder
 {
     std::shared_ptr<mir::cookie::Authority> const cookie_authority = mir::cookie::Authority::create();
     mtd::MockInputSeat seat;
-    mi::DefaultEventBuilder builder{MirInputDeviceId{3}, cookie_authority, mt::fake_shared(seat)};
+    mtd::AdvanceableClock clock;
+    mi::DefaultEventBuilder builder{
+        MirInputDeviceId{3},
+        mt::fake_shared(clock),
+        cookie_authority,
+        mt::fake_shared(seat)};
     MockEventBuilder()
     {
         ON_CALL(*this, key_event(_,_,_,_))
@@ -99,6 +105,8 @@ struct MockEventBuilder : mi::EventBuilder
                                   }));
     }
     using EventBuilder::Timestamp;
+    MOCK_METHOD1(calibrate_timestamps, void(bool enable));
+
     MOCK_METHOD4(key_event, mir::EventUPtr(Timestamp, MirKeyboardAction, xkb_keysym_t, int));
 
     MOCK_METHOD2(touch_event, mir::EventUPtr(Timestamp, std::vector<mir::events::ContactState> const&));

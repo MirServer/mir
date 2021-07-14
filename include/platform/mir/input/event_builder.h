@@ -38,7 +38,13 @@ class EventBuilder
 public:
     EventBuilder() = default;
     virtual ~EventBuilder() = default;
+    /// Timestamps in returned events are automatically calibrated to the Mir clock
     using Timestamp = std::chrono::nanoseconds;
+
+    /// True resets timestamp calibration to it's initial state, so the next event with a timestamp will be at the
+    /// "current" time (according to the Mir clock) and subsequent events will be relative to that. False disables
+    /// calibration, so future events will not have their timestamps modified.
+    virtual void calibrate_timestamps(bool enable) = 0;
 
     virtual EventUPtr key_event(Timestamp timestamp, MirKeyboardAction action, xkb_keysym_t keysym, int scan_code) = 0;
 

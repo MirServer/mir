@@ -317,6 +317,7 @@ std::shared_ptr<mi::DefaultInputDeviceHub> mir::DefaultServerConfiguration::the_
            auto hub = std::make_shared<mi::DefaultInputDeviceHub>(
                the_seat(),
                the_input_reading_multiplexer(),
+               the_clock(),
                the_cookie_authority(),
                the_key_mapper(),
                the_server_status_listener());
