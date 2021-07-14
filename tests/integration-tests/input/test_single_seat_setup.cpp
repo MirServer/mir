@@ -132,9 +132,13 @@ struct SingleSeatInputDeviceHubSetup : ::testing::Test
                        mt::fake_shared(mock_cursor_listener), mt::fake_shared(display_config),
                        mt::fake_shared(key_mapper),           mt::fake_shared(clock),
                        mt::fake_shared(mock_seat_observer)};
-    mi::DefaultInputDeviceHub hub{mt::fake_shared(seat), mt::fake_shared(multiplexer),
-                                  cookie_authority,      mt::fake_shared(key_mapper),
-                                  mt::fake_shared(mock_status_listener)};
+    mi::DefaultInputDeviceHub hub{
+        mt::fake_shared(seat),
+        mt::fake_shared(multiplexer),
+        mt::fake_shared(clock),
+        cookie_authority,
+        mt::fake_shared(key_mapper),
+        mt::fake_shared(mock_status_listener)};
     NiceMock<mtd::MockInputDeviceObserver> mock_observer;
     mi::ConfigChanger changer{
         mt::fake_shared(mock_input_manager),

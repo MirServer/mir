@@ -182,12 +182,14 @@ void mi::ExternalInputDeviceHub::Internal::changes_complete()
 mi::DefaultInputDeviceHub::DefaultInputDeviceHub(
     std::shared_ptr<mi::Seat> const& seat,
     std::shared_ptr<dispatch::MultiplexingDispatchable> const& input_multiplexer,
+    std::shared_ptr<time::Clock> const& clock,
     std::shared_ptr<mir::cookie::Authority> const& cookie_authority,
     std::shared_ptr<mi::KeyMapper> const& key_mapper,
     std::shared_ptr<mir::ServerStatusListener> const& server_status_listener)
     : seat{seat},
       input_dispatchable{input_multiplexer},
       device_queue(std::make_shared<dispatch::ActionQueue>()),
+      clock(clock),
       cookie_authority(cookie_authority),
       key_mapper(key_mapper),
       server_status_listener(server_status_listener),
@@ -216,7 +218,12 @@ void mi::DefaultInputDeviceHub::add_device(std::shared_ptr<InputDevice> const& d
         auto handle = restore_or_create_device(lock, *device, queue);
         // send input device info to observer loop..
         devices.push_back(std::make_unique<RegisteredDevice>(
-            device, handle->id(), queue, cookie_authority, handle));
+            device,
+            handle->id(),
+            queue,
+            clock,
+            cookie_authority,
+            handle));
 
         auto const& dev = devices.back();
         add_device_handle(lock, handle);
@@ -271,10 +278,12 @@ mi::DefaultInputDeviceHub::RegisteredDevice::RegisteredDevice(
     std::shared_ptr<InputDevice> const& dev,
     MirInputDeviceId device_id,
     std::shared_ptr<dispatch::ActionQueue> const& queue,
+    std::shared_ptr<time::Clock> const& clock,
     std::shared_ptr<mir::cookie::Authority> const& cookie_authority,
     std::shared_ptr<mi::DefaultDevice> const& handle)
     : handle(handle),
       device_id(device_id),
+      clock(clock),
       cookie_authority(cookie_authority),
       device(dev),
       queue(queue)
@@ -315,7 +324,7 @@ void mi::DefaultInputDeviceHub::RegisteredDevice::start(std::shared_ptr<Seat> co
     multiplexer->add_watch(queue);
 
     this->seat = seat;
-    builder = std::make_unique<DefaultEventBuilder>(device_id, cookie_authority, seat);
+    builder = std::make_unique<DefaultEventBuilder>(device_id, clock, cookie_authority, seat);
     device->start(this, builder.get());
 }
 

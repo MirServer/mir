@@ -25,6 +25,7 @@
 #include <memory>
 #include <chrono>
 #include <vector>
+#include <optional>
 
 namespace mir
 {
@@ -38,20 +39,39 @@ class EventBuilder
 public:
     EventBuilder() = default;
     virtual ~EventBuilder() = default;
+    /// Timestamps in returned events are automatically calibrated to the Mir clock. If nullopt is given current mir
+    /// clock time is used.
     using Timestamp = std::chrono::nanoseconds;
 
-    virtual EventUPtr key_event(Timestamp timestamp, MirKeyboardAction action, xkb_keysym_t keysym, int scan_code) = 0;
+    /// True resets timestamp calibration to it's initial state, so the next event with a timestamp will be at the
+    /// "current" time (according to the Mir clock) and subsequent events will be relative to that. False disables
+    /// calibration, so future events will not have their timestamps modified.
+    virtual void calibrate_timestamps(bool enable) = 0;
 
-    virtual EventUPtr pointer_event(Timestamp timestamp, MirPointerAction action, MirPointerButtons buttons_pressed,
-                                    float hscroll_value, float vscroll_value, float relative_x_value,
-                                    float relative_y_value) = 0;
+    virtual EventUPtr key_event(
+        std::optional<Timestamp> timestamp,
+        MirKeyboardAction action,
+        xkb_keysym_t keysym,
+        int scan_code) = 0;
 
-    virtual EventUPtr pointer_event(Timestamp timestamp, MirPointerAction action, MirPointerButtons buttons_pressed,
-                                    float x_position, float y_position,
-                                    float hscroll_value, float vscroll_value, float relative_x_value,
-                                    float relative_y_value) = 0;
+    virtual EventUPtr pointer_event(
+        std::optional<Timestamp> timestamp,
+        MirPointerAction action,
+        MirPointerButtons buttons_pressed,
+        float hscroll_value, float vscroll_value,
+        float relative_x_value, float relative_y_value) = 0;
 
-    virtual EventUPtr touch_event(Timestamp timestamp, std::vector<mir::events::ContactState> const& contacts) = 0;
+    virtual EventUPtr pointer_event(
+        std::optional<Timestamp> timestamp,
+        MirPointerAction action,
+        MirPointerButtons buttons_pressed,
+        float x_position, float y_position,
+        float hscroll_value, float vscroll_value,
+        float relative_x_value, float relative_y_value) = 0;
+
+    virtual EventUPtr touch_event(
+        std::optional<Timestamp> timestamp,
+        std::vector<mir::events::ContactState> const& contacts) = 0;
 protected:
     EventBuilder(EventBuilder const&) = delete;
     EventBuilder& operator=(EventBuilder const&) = delete;

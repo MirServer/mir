@@ -62,9 +62,21 @@ struct SeatInputDeviceTracker : ::testing::Test
     std::shared_ptr<mir::cookie::Authority> cookie_factory = mir::cookie::Authority::create();
     mtd::AdvanceableClock clock;
 
-    mi::DefaultEventBuilder some_device_builder{some_device, cookie_factory, mt::fake_shared(mock_seat)};
-    mi::DefaultEventBuilder another_device_builder{another_device, cookie_factory, mt::fake_shared(mock_seat)};
-    mi::DefaultEventBuilder third_device_builder{third_device, cookie_factory, mt::fake_shared(mock_seat)};
+    mi::DefaultEventBuilder some_device_builder{
+        some_device,
+        mt::fake_shared(clock),
+        cookie_factory,
+        mt::fake_shared(mock_seat)};
+    mi::DefaultEventBuilder another_device_builder{
+        another_device,
+        mt::fake_shared(clock),
+        cookie_factory,
+        mt::fake_shared(mock_seat)};
+    mi::DefaultEventBuilder third_device_builder{
+        third_device,
+        mt::fake_shared(clock),
+        cookie_factory,
+        mt::fake_shared(mock_seat)};
     mi::receiver::XKBMapper mapper;
     mi::SeatInputDeviceTracker tracker{
         mt::fake_shared(mock_dispatcher), mt::fake_shared(mock_visualizer), mt::fake_shared(mock_cursor_listener),

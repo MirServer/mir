@@ -24,6 +24,7 @@
 #include <optional>
 #include <vector>
 #include <set>
+#include <chrono>
 #include <xcb/xcb.h>
 
 struct xkb_context;
@@ -68,8 +69,8 @@ private:
     void process_input_events();
     void process_input_event(xcb_generic_event_t* event);
     void process_xkb_event(xcb_generic_event_t* event);
-    void key_pressed(xcb_keycode_t key, xcb_timestamp_t timestamp);
-    void key_released(xcb_keycode_t key, xcb_timestamp_t timestamp);
+    void key_pressed(std::optional<std::chrono::nanoseconds> event_time, xcb_keycode_t key);
+    void key_released(std::optional<std::chrono::nanoseconds> event_time, xcb_keycode_t key);
     /// Defer work until all pending events are processed. Should only be called while processing events.
     void defer(std::function<void()>&& work);
     std::shared_ptr<mir::X::X11Resources> const x11_resources;
@@ -81,7 +82,6 @@ private:
     xkb_context* const xkb_ctx;
     xkb_keymap* const keymap;
     xkb_state* const key_state;
-    xcb_timestamp_t last_timestamp{0};
     std::set<xcb_keycode_t> pressed_keys;
     std::set<xcb_keycode_t> modifiers;
     bool kbd_grabbed;

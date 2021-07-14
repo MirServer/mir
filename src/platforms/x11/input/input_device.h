@@ -27,6 +27,7 @@
 #include "mir/optional_value.h"
 
 #include <chrono>
+#include <optional>
 
 namespace mir
 {
@@ -39,6 +40,8 @@ namespace X
 class XInputDevice : public input::InputDevice
 {
 public:
+    using EventTime = std::optional<std::chrono::nanoseconds>;
+
     XInputDevice(InputDeviceInfo const& info);
 
     std::shared_ptr<dispatch::Dispatchable> dispatchable();
@@ -54,21 +57,21 @@ public:
     virtual void apply_settings(TouchscreenSettings const&) override;
 
     bool started() const;
-    void key_press(std::chrono::nanoseconds event_time, xkb_keysym_t keysym, int scan_code);
-    void key_release(std::chrono::nanoseconds event_time, xkb_keysym_t keysym, int scan_code);
+    void key_press(EventTime event_time, xkb_keysym_t keysym, int scan_code);
+    void key_release(EventTime event_time, xkb_keysym_t keysym, int scan_code);
     void update_button_state(int button);
     void pointer_press(
-        std::chrono::nanoseconds event_time,
+        EventTime event_time,
         int button,
         mir::geometry::PointF pos,
         mir::geometry::DisplacementF scroll);
     void pointer_release(
-        std::chrono::nanoseconds event_time,
+        EventTime event_time,
         int button,
         mir::geometry::PointF pos,
         mir::geometry::DisplacementF scroll);
     void pointer_motion(
-        std::chrono::nanoseconds event_time,
+        EventTime event_time,
         mir::geometry::PointF pos,
         mir::geometry::DisplacementF scroll);
 
