@@ -33,6 +33,10 @@ class InputDeviceHub;
 class Seat;
 class Keymap;
 }
+namespace time
+{
+class Clock;
+}
 namespace frontend
 {
 class WlPointer;
@@ -44,6 +48,7 @@ class WlSeat : public wayland::Seat::Global
 public:
     WlSeat(
         wl_display* display,
+        std::shared_ptr<time::Clock> const& clock,
         std::shared_ptr<mir::input::InputDeviceHub> const& input_hub,
         std::shared_ptr<mir::input::Seat> const& seat,
         bool enable_key_repeat);
@@ -102,6 +107,7 @@ private:
     std::shared_ptr<ListenerList<WlKeyboard>> const keyboard_listeners;
     std::shared_ptr<ListenerList<WlTouch>> const touch_listeners;
 
+    std::shared_ptr<time::Clock> const clock;
     std::shared_ptr<input::InputDeviceHub> const input_hub;
     std::shared_ptr<input::Seat> const seat;
     bool const enable_key_repeat;

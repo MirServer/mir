@@ -25,15 +25,15 @@
 #include "mir/executor.h"
 #include "mir_toolkit/events/event.h"
 #include "mir/log.h"
-
-#include <chrono>
+#include "mir/time/clock.h"
 
 namespace mf = mir::frontend;
 namespace mw = mir::wayland;
 namespace geom = mir::geometry;
 
-mf::WlTouch::WlTouch(wl_resource* new_resource)
-    : Touch(new_resource, Version<6>())
+mf::WlTouch::WlTouch(wl_resource* new_resource, std::shared_ptr<time::Clock> const& clock)
+    : Touch(new_resource, Version<6>()),
+      clock{clock}
 {
 }
 
@@ -99,14 +99,12 @@ void mf::WlTouch::down(
         root_position.first - offset.dx.as_int(),
         root_position.second - offset.dy.as_int());
 
-    // We wont have a "real" timestamp from libinput, so we have to make our own based on the time offset
-    auto const time_offset = ms - std::chrono::steady_clock::now().time_since_epoch();
     auto const listener_id = target_surface->add_destroy_listener(
-        [this, touch_id, time_offset]()
+        [this, touch_id]()
         {
             auto const serial = wl_display_next_serial(wl_client_get_display(client));
             auto const timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
-                time_offset + std::chrono::steady_clock::now().time_since_epoch());
+                clock->now().time_since_epoch());
             up(serial, timestamp, touch_id);
             maybe_frame();
         });

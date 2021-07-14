@@ -54,6 +54,10 @@ namespace scene
 {
 class Surface;
 }
+namespace time
+{
+class Clock;
+}
 namespace frontend
 {
 class WlCompositor;
@@ -110,6 +114,7 @@ public:
     WaylandConnector(
         std::shared_ptr<shell::Shell> const& shell,
         std::shared_ptr<MirDisplay> const& display_config,
+        std::shared_ptr<time::Clock> const& clock,
         std::shared_ptr<input::InputDeviceHub> const& input_hub,
         std::shared_ptr<input::Seat> const& seat,
         std::shared_ptr<graphics::GraphicBufferAllocator> const& allocator,

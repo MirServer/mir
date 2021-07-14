@@ -149,6 +149,7 @@ private:
 
 mf::WlSeat::WlSeat(
     wl_display* display,
+    std::shared_ptr<time::Clock> const& clock,
     std::shared_ptr<mi::InputDeviceHub> const& input_hub,
     std::shared_ptr<mi::Seat> const& seat,
     bool enable_key_repeat)
@@ -164,6 +165,7 @@ mf::WlSeat::WlSeat(
         pointer_listeners{std::make_shared<ListenerList<WlPointer>>()},
         keyboard_listeners{std::make_shared<ListenerList<WlKeyboard>>()},
         touch_listeners{std::make_shared<ListenerList<WlTouch>>()},
+        clock{clock},
         input_hub{input_hub},
         seat{seat},
         enable_key_repeat{enable_key_repeat}
@@ -278,7 +280,7 @@ void mf::WlSeat::Instance::get_keyboard(wl_resource* new_keyboard)
 
 void mf::WlSeat::Instance::get_touch(wl_resource* new_touch)
 {
-    auto const touch = new WlTouch{new_touch};
+    auto const touch = new WlTouch{new_touch, seat->clock};
     seat->touch_listeners->register_listener(client, touch);
     touch->add_destroy_listener(
         [listeners = seat->touch_listeners, listener = touch, client = client]()

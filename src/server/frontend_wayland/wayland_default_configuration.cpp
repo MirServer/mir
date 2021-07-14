@@ -252,6 +252,7 @@ std::shared_ptr<mf::Connector>
             return std::make_shared<mf::WaylandConnector>(
                 the_shell(),
                 display_config,
+                the_clock(),
                 the_input_device_hub(),
                 the_seat(),
                 the_buffer_allocator(),

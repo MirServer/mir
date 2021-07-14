@@ -32,6 +32,10 @@ struct MirTouchEvent;
 namespace mir
 {
 class Executor;
+namespace time
+{
+class Clock;
+}
 
 namespace frontend
 {
@@ -40,7 +44,7 @@ class WlSurface;
 class WlTouch : public wayland::Touch
 {
 public:
-    WlTouch(wl_resource* new_resource);
+    WlTouch(wl_resource* new_resource, std::shared_ptr<time::Clock> const& clock);
 
     ~WlTouch();
 
@@ -55,6 +59,7 @@ private:
         wayland::DestroyListenerId destroy_listener_id;
     };
 
+    std::shared_ptr<time::Clock> const clock;
     /// Maps touch IDs to the surfaces the touch is on
     std::unordered_map<int32_t, TouchedSurface> touch_id_to_surface;
     bool needs_frame{false};
